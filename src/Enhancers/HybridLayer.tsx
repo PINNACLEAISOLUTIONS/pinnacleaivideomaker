@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
     AbsoluteFill,
     Img,
@@ -7,9 +7,9 @@ import {
     interpolate,
     useVideoConfig,
     staticFile,
-    continueRender,
-    delayRender,
+    OffthreadVideo,
 } from "remotion";
+
 
 // Blueprint Timeline Type
 type BlueprintSegment = {
@@ -71,33 +71,14 @@ const ReplaceSegment: React.FC<{ src: string; durationInFrames: number }> = ({
 };
 
 // Props-first: accept timeline array directly
-export const HybridLayer: React.FC<{ timeline?: BlueprintSegment[] }> = ({
-    timeline: propTimeline,
-}) => {
+export const HybridLayer: React.FC<{
+    timeline: BlueprintSegment[];
+    videoSource: string;
+    videoSize: { w: number; h: number };
+}> = ({ timeline, videoSource, videoSize }) => {
     const { fps } = useVideoConfig();
-    const [timeline, setTimeline] = useState<BlueprintSegment[]>(propTimeline || []);
-    const [handle] = useState(() => delayRender());
 
-    useEffect(() => {
-        if (propTimeline && propTimeline.length > 0) {
-            setTimeline(propTimeline);
-            continueRender(handle);
-            return;
-        }
-
-        fetch(staticFile("blueprint.json"))
-            .then((res) => res.json())
-            .then((data) => {
-                setTimeline(data.timeline || []);
-                continueRender(handle);
-            })
-            .catch((err) => {
-                console.error("HybridLayer: Failed to load blueprint", err);
-                continueRender(handle);
-            });
-    }, [handle, propTimeline]);
-
-    if (timeline.length === 0) return null;
+    if (!timeline || timeline.length === 0) return null;
 
     let currentStartFrame = 0;
 
@@ -114,11 +95,24 @@ export const HybridLayer: React.FC<{ timeline?: BlueprintSegment[] }> = ({
                         from={from}
                         durationInFrames={durationFrames}
                     >
-                        {segment.asset && (
+                        {segment.type === "GENERATE" && segment.asset ? (
                             <ReplaceSegment
                                 src={segment.asset}
                                 durationInFrames={durationFrames}
                             />
+                        ) : (
+                            <AbsoluteFill>
+                                <OffthreadVideo
+                                    src={videoSource}
+                                    startFrom={from}
+                                    volume={0}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                    }}
+                                />
+                            </AbsoluteFill>
                         )}
 
                         {segment.transition === "glitch" && (
@@ -128,17 +122,7 @@ export const HybridLayer: React.FC<{ timeline?: BlueprintSegment[] }> = ({
                         )}
 
                         {segment.transition === "fade" && (
-                            <AbsoluteFill
-                                style={{
-                                    backgroundColor: "black",
-                                    opacity: interpolate(
-                                        useCurrentFrame(),
-                                        [0, 10],
-                                        [1, 0]
-                                    ),
-                                    zIndex: 30,
-                                }}
-                            />
+                            <FadeOverlay durationInFrames={10} />
                         )}
                     </Sequence>
                 );
@@ -146,4 +130,23 @@ export const HybridLayer: React.FC<{ timeline?: BlueprintSegment[] }> = ({
         </AbsoluteFill>
     );
 };
+
+// Stateless transition components to avoid hook violations in map
+const FadeOverlay: React.FC<{ durationInFrames: number }> = ({ durationInFrames }) => {
+    const frame = useCurrentFrame();
+    const opacity = interpolate(frame, [0, durationInFrames], [1, 0], {
+        extrapolateRight: "clamp",
+    });
+
+    return (
+        <AbsoluteFill
+            style={{
+                backgroundColor: "black",
+                opacity,
+                zIndex: 30,
+            }}
+        />
+    );
+};
+
 

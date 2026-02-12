@@ -34,7 +34,9 @@ export const BrandingLayer: React.FC<{ brandName: string; brandColor: string; fr
                     style={{
                         width: 180,
                         height: 180,
-                        mixBlendMode: "multiply",
+                        mixBlendMode: "screen",
+                        filter: "contrast(1.5) brightness(1.2)",
+                        clipPath: "polygon(50% 0%, 0% 85%, 100% 85%)",
                         objectFit: "contain",
                     }}
                 />

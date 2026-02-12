@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
     AbsoluteFill,
     useCurrentFrame,
     useVideoConfig,
     spring,
-    staticFile,
-    continueRender,
-    delayRender,
 } from "remotion";
-import { loadFont } from "@remotion/google-fonts/Montserrat";
 
-const { fontFamily: montserrat } = loadFont();
 
 // Timeline Caption Type
 type BlueprintSegment = {
@@ -46,7 +41,7 @@ const HormoziWord: React.FC<{
     return (
         <span
             style={{
-                fontFamily: montserrat,
+                fontFamily: "Arial, sans-serif",
                 fontSize: 88,
                 fontWeight: 900,
                 textTransform: "uppercase",
@@ -74,44 +69,19 @@ export const OverlayLayer: React.FC<{
 }> = ({ transcript: propTranscript, timeline: propTimeline, brandColor }) => {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const [transcript, setTranscript] = useState<TranscriptWord[]>(propTranscript || []);
-    const [timeline, setTimeline] = useState<BlueprintSegment[]>(propTimeline || []);
-    const [handle] = useState(() => delayRender());
-
-    useEffect(() => {
-        if ((propTranscript && propTranscript.length > 0) || (propTimeline && propTimeline.length > 0)) {
-            setTranscript(propTranscript || []);
-            setTimeline(propTimeline || []);
-            continueRender(handle);
-            return;
-        }
-
-        fetch(staticFile("blueprint.json"))
-            .then((res) => res.json())
-            .then((data) => {
-                setTimeline(data.timeline || []);
-                // If the blueprint ALSO has a transcript key (from a hybrid run), we can use it
-                setTranscript(data.transcript || []);
-                continueRender(handle);
-            })
-            .catch((err) => {
-                console.error("OverlayLayer: Could not load blueprint", err);
-                continueRender(handle);
-            });
-    }, [handle, propTranscript, propTimeline]);
 
     const currentTime = frame / fps;
 
     // SCENARIO A: Word-level analysis exists
-    if (transcript.length > 0) {
-        const activeIdx = transcript.findIndex(
+    if (propTranscript && propTranscript.length > 0) {
+        const activeIdx = propTranscript.findIndex(
             (w) => currentTime >= w.start && currentTime < w.end
         );
 
         if (activeIdx !== -1) {
             const windowStart = Math.max(0, activeIdx - 1);
-            const windowEnd = Math.min(transcript.length, activeIdx + 3);
-            const visibleWords = transcript.slice(windowStart, windowEnd);
+            const windowEnd = Math.min(propTranscript.length, activeIdx + 3);
+            const visibleWords = propTranscript.slice(windowStart, windowEnd);
 
             return (
                 <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", pointerEvents: "none", paddingTop: "15%" }}>
@@ -140,38 +110,51 @@ export const OverlayLayer: React.FC<{
     }
 
     // SCENARIO B: Segment-level captions fallback
-    if (timeline.length > 0) {
-        let currentTotalSecs = 0;
-        const activeSegment = timeline.find((s) => {
-            const start = currentTotalSecs;
-            const end = currentTotalSecs + s.duration;
-            currentTotalSecs = end;
-            return currentTime >= start && currentTime < end;
-        });
+    if (propTimeline && propTimeline.length > 0) {
+        let elapsed = 0;
+        let activeSegment = null;
+        for (const s of propTimeline) {
+            const start = elapsed;
+            const end = elapsed + s.duration;
+            if (currentTime >= start && currentTime < end) {
+                activeSegment = s;
+                break;
+            }
+            elapsed = end;
+        }
 
         if (activeSegment && activeSegment.caption) {
-            // Split segment caption into simulated "fast words" or just show the whole thing
             const words = activeSegment.caption.split(" ");
+            const wordsPerSecond = 3.5; // High energy pace
+            const framesPerWord = Math.floor(fps / wordsPerSecond);
+
             return (
                 <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", pointerEvents: "none", paddingTop: "15%" }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", maxWidth: "85%", gap: "4px" }}>
-                        {words.map((word, idx) => (
-                            <HormoziWord
-                                key={idx}
-                                word={word}
-                                isActive={true} // Pop the whole caption for visual impact if no word-level timing
-                                isPast={false}
-                                localFrame={frame % 30}
-                                fps={fps}
-                                color={brandColor}
-                            />
-                        ))}
+                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", maxWidth: "85%", gap: "8px" }}>
+                        {words.map((word, idx) => {
+                            const wordStartFrame = idx * framesPerWord;
+                            const isActive = frame % (activeSegment.duration * fps) >= wordStartFrame;
+
+                            if (!isActive) return null;
+
+                            return (
+                                <HormoziWord
+                                    key={`${activeSegment.id}-${idx}`}
+                                    word={word}
+                                    isActive={true}
+                                    isPast={false}
+                                    localFrame={(frame % (activeSegment.duration * fps)) - wordStartFrame}
+                                    fps={fps}
+                                    color={brandColor}
+                                />
+                            );
+                        })}
                     </div>
                 </AbsoluteFill>
             );
         }
     }
 
+
     return null;
 };
-

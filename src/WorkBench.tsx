@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
     AbsoluteFill,
-    OffthreadVideo,
+    Audio,
     staticFile,
     continueRender,
     delayRender,
+    useCurrentFrame,
 } from "remotion";
-import { getVideoMetadata } from "@remotion/media-utils";
 import { z } from "zod";
 import { HybridLayer } from "./Enhancers/HybridLayer";
 import { OverlayLayer } from "./Enhancers/OverlayLayer";
 import { BrandingLayer } from "./Enhancers/BrandingLayer";
-import { useCurrentFrame } from "remotion";
+
 
 // Schema for sidebar controls
 export const workBenchSchema = z.object({
@@ -64,60 +64,41 @@ const THEME_OVERLAYS: Record<string, string> = {
     Minimal: "rgba(255,255,255,0.03)",
 };
 
-export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
+export const WorkBench: React.FC<z.infer<typeof workBenchSchema> & { blueprint?: Blueprint }> = ({
     theme = "Standard",
     showCaption = true,
+    blueprint: propBlueprint,
 }) => {
+    const frame = useCurrentFrame();
+
     const [videoSize, setVideoSize] = useState<{ w: number; h: number } | null>(
         null
     );
-    const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
+    const [blueprint, setBlueprint] = useState<Blueprint | null>(propBlueprint || null);
     const [handle] = useState(() => delayRender());
 
     const videoSource = staticFile("video-source.mp4");
     const overlayColor = THEME_OVERLAYS[theme] || "transparent";
 
     useEffect(() => {
-        // Load video metadata + Enterprise Blueprint in parallel
-        Promise.all([
-            getVideoMetadata(videoSource),
-            fetch(staticFile("blueprint.json")).then((r) => r.json()),
-        ])
-            .then(([meta, blueprintData]) => {
-                setVideoSize({ w: meta.width, h: meta.height });
-                setBlueprint(blueprintData);
-                continueRender(handle);
-            })
-            .catch((err) => {
-                console.error("WorkBench Enterprise init error:", err);
-                // Fallback attempt for previous data format
-                fetch(staticFile("hybrid_plan.json"))
-                    .then(r => r.json())
-                    .then(plan => {
-                        // Build a fake blueprint from hybrid plan if needed
-                        setBlueprint({
-                            project: { title: "Remake", duration_seconds: 60, music_mood: "Cinematic", brand_color: "#FFE600" },
-                            timeline: plan.visuals.map((v: any, i: number) => ({ id: i, duration: v.end - v.start, type: v.type, asset: v.asset })),
-                            transcript: plan.transcript
-                        });
-                        continueRender(handle);
-                    })
-                    .catch(() => continueRender(handle));
-            });
-    }, [handle, videoSource]);
+        if (propBlueprint) {
+            setVideoSize({ w: 1080, h: 1920 });
+            continueRender(handle);
+            return;
+        }
+
+        // Fallback for Studio (HTTP)
+        setVideoSize({ w: 1080, h: 1920 });
+        try {
+            setBlueprint(require("../public/blueprint.json"));
+        } catch (e) { }
+        continueRender(handle);
+    }, [handle, videoSource, propBlueprint]);
 
     if (!videoSize || !blueprint) {
         return (
-            <AbsoluteFill
-                style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontSize: 40,
-                    color: "white",
-                    backgroundColor: "#000",
-                }}
-            >
-                Loading Enterprise Engine…
+            <AbsoluteFill style={{ backgroundColor: "black", color: "white", justifyContent: 'center', alignItems: 'center', fontSize: 40 }}>
+                Initializing Level 9 Architect...
             </AbsoluteFill>
         );
     }
@@ -125,50 +106,58 @@ export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
     const brandColor = blueprint.project.brand_color || "#FFE600";
 
     return (
-        <AbsoluteFill style={{ backgroundColor: "#000" }}>
+        <AbsoluteFill style={{ backgroundColor: "black" }}>
             {/* 
                LAYER 1: AUDIO MASTER
-               Hidden video for continuous, unbroken audio.
+               Pure audio stream for continuous, unbroken sound.
             */}
-            <OffthreadVideo
+            <Audio
                 src={videoSource}
-                style={{ opacity: 0 }}
                 volume={1}
             />
 
             {/* 
                LAYER 2: HYBRID VISUALS
-               Reads timeline from Blueprint — swaps types & transitions.
+               Original TikTok footage + AI Asset Overlays
             */}
-            <HybridLayer timeline={blueprint.timeline} />
+            <HybridLayer
+                videoSource={videoSource}
+                timeline={blueprint.timeline}
+                videoSize={videoSize}
+            />
 
-            {/* LAYER 3: THEME OVERLAY */}
+            {/* 
+               LAYER 3: THEME OVERLAY
+               Color grading and brand aesthetics
+            */}
             <AbsoluteFill
                 style={{
                     backgroundColor: overlayColor,
-                    pointerEvents: "none",
+                    mixBlendMode: "overlay",
                 }}
             />
 
             {/* 
-               LAYER 4: HORMOZI CAPTIONS
-               Reads from Blueprint (transcript or captions fallback).
+               LAYER 4: AI CAPTION ENGINE
+               Hormozi-style kinetic typography
             */}
             {showCaption && (
-                <OverlayLayer
-                    transcript={blueprint.transcript}
-                    timeline={blueprint.timeline}
-                    brandColor={brandColor}
-                />
+                <div style={{ zIndex: 50 }}>
+                    <OverlayLayer
+                        timeline={blueprint.timeline}
+                        brandColor={brandColor}
+                    />
+                </div>
             )}
 
             {/* LAYER 5: ENTERPRISE BRANDING */}
-            <BrandingLayer
-                brandName="Pinnacle AI Solutions"
-                brandColor={brandColor}
-                frame={useCurrentFrame()}
-            />
+            <div style={{ zIndex: 100 }}>
+                <BrandingLayer
+                    brandName="Pinnacle AI Solutions"
+                    brandColor={brandColor}
+                    frame={frame}
+                />
+            </div>
         </AbsoluteFill>
     );
 };
-
