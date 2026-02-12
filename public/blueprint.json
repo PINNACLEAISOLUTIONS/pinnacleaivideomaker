@@ -1,0 +1,82 @@
+{
+  "project": {
+    "title": "Top 5 FREE AI Video Generators 2025",
+    "duration_seconds": 40,
+    "music_mood": "High-Energy",
+    "brand_color": "#00FFFF"
+  },
+  "timeline": [
+    {
+      "id": 1,
+      "duration": 6,
+      "type": "GENERATE",
+      "visual_prompt": "A professional-looking 3D animated man with a short beard, dark hair, wearing a dark collared shirt, smiling directly at the viewer, seated at a desk with a microphone, in a modern office background with a glowing neon sign in blue reading 'SCALE & BEYOND', cinematic lighting, medium shot, engaging expression.",
+      "caption": "Top 5 FREE AI Video Generators",
+      "transition": "glitch",
+      "asset": "assets/clip-1.jpg"
+    },
+    {
+      "id": 2,
+      "duration": 6,
+      "type": "STOCK",
+      "search_term": "AI video generation software interface, dark mode, showing diverse AI-generated image and video styles like 'cinematic', '3D clay', 'modern anime', and realistic footage examples, dynamic display of creative options.",
+      "caption": "Artlist AI: Music & Sound Effects",
+      "transition": "cut",
+      "asset": "assets/clip-2.jpg"
+    },
+    {
+      "id": 3,
+      "duration": 6,
+      "type": "STOCK",
+      "search_term": "Novi AI text to video generator dashboard, dark theme, showcasing examples of AI-generated animated cats in various engaging scenarios (e.g., cat playing guitar, cats walking in suits, cat meditating), clean UI, with 'AI Story To Video' button highlighted.",
+      "caption": "Novi AI: Text & Image to Video",
+      "transition": "cut",
+      "asset": "assets/clip-3.jpg"
+    },
+    {
+      "id": 4,
+      "duration": 4,
+      "type": "STOCK",
+      "search_term": "Hailuo AI video creation platform, dark interface, featuring a gallery of visually stunning AI-animated video clips from simple prompts, including fantastical creatures, anime-style scenes, and realistic character actions, user gallery view.",
+      "caption": "Hailuo AI: Beautiful Animated Videos",
+      "transition": "cut",
+      "asset": "assets/clip-4.jpg"
+    },
+    {
+      "id": 5,
+      "duration": 6,
+      "type": "STOCK",
+      "search_term": "Pollo AI generator interface, dark mode, showing examples of realistic and stylized talking AI avatars in various settings, demonstrating their ability to deliver scripts, vibrant and creative AI output examples.",
+      "caption": "Pollo AI: Realistic Talking Avatars",
+      "transition": "cut",
+      "asset": "assets/clip-5.jpg"
+    },
+    {
+      "id": 6,
+      "duration": 3,
+      "type": "STOCK",
+      "search_term": "Clean and modern UI of a powerful AI video generation tool, dark theme, showing options for 'Text to Video', 'Frames to Video', and 'Ingredients to Video', minimalist and intuitive design.",
+      "caption": "Flow (Google VEO3): Next-Gen AI",
+      "transition": "cut",
+      "asset": "assets/clip-6.jpg"
+    },
+    {
+      "id": 7,
+      "duration": 4,
+      "type": "GENERATE",
+      "visual_prompt": "A classic vintage brown sports car driving dynamically down a scenic, tree-lined suburban road on a bright sunny day, lush green trees and vibrant flowers blurred in the background, clear blue sky with soft white clouds, low angle cinematic tracking shot, high quality AI generated video.",
+      "caption": "High-Quality AI Video from Prompts",
+      "transition": "cut",
+      "asset": "assets/clip-7.jpg"
+    },
+    {
+      "id": 8,
+      "duration": 5,
+      "type": "GENERATE",
+      "visual_prompt": "The same professional-looking 3D animated man with a short beard, dark hair, wearing a dark collared shirt, smiling and pointing downwards to encourage engagement, in a modern office background with a glowing neon sign in blue reading 'SCALE & BEYOND', cinematic lighting, medium shot, call to action.",
+      "caption": "Subscribe for More AI Tips!",
+      "transition": "fade",
+      "asset": "assets/clip-8.jpg"
+    }
+  ]
+}

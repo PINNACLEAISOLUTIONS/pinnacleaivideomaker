@@ -1,4 +1,5 @@
-import { Composition } from "remotion";
+import { Composition, staticFile } from "remotion";
+import { getAudioDurationInSeconds } from "@remotion/media-utils";
 import { HelloWorld, myCompSchema } from "./HelloWorld";
 import { Logo, myCompSchema2 } from "./HelloWorld/Logo";
 import { PinnacleAd } from "./PinnacleAd";
@@ -33,7 +34,20 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="WorkBench"
         component={WorkBench}
-        durationInFrames={300}
+        calculateMetadata={async () => {
+          try {
+            const blueprint = await fetch(staticFile("blueprint.json")).then((r) => r.json());
+            const durationSecs = blueprint.timeline.reduce((acc: number, s: any) => acc + s.duration, 0);
+            return {
+              durationInFrames: Math.ceil(durationSecs * 30),
+            };
+          } catch (e) {
+            const duration = await getAudioDurationInSeconds(staticFile("video-source.mp4"));
+            return {
+              durationInFrames: Math.ceil(duration * 30),
+            };
+          }
+        }}
         fps={30}
         width={1080}
         height={1920}
@@ -41,7 +55,7 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={{
           theme: "Standard",
           customCaption: "YOUR TEXT HERE",
-          showCaption: false
+          showCaption: true
         }}
       />
 

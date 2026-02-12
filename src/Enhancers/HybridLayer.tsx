@@ -9,17 +9,35 @@ import {
     staticFile,
     continueRender,
     delayRender,
-    OffthreadVideo,
 } from "remotion";
 
-// Visual Segment Type (from visuals array)
-type VisualSegment = {
-    start: number;
-    end: number;
-    type: "KEEP" | "REPLACE";
-    description?: string;
-    visual_prompt?: string;
+// Blueprint Timeline Type
+type BlueprintSegment = {
+    id: number;
+    duration: number;
+    type: "STOCK" | "GENERATE";
     asset?: string;
+    caption?: string;
+    transition?: "glitch" | "fade" | "cut";
+};
+
+// Glitch effect component
+const GlitchOverlay: React.FC = () => {
+    const frame = useCurrentFrame();
+    const opacity = frame % 10 < 2 ? 0.3 : 0;
+    const offset = Math.sin(frame) * 5;
+
+    return (
+        <AbsoluteFill
+            style={{
+                backgroundColor: "rgba(0, 255, 234, 0.1)",
+                opacity,
+                transform: `translateX(${offset}px)`,
+                pointerEvents: "none",
+                zIndex: 20,
+            }}
+        />
+    );
 };
 
 // REPLACE segment: AI Asset + Ken Burns
@@ -29,11 +47,11 @@ const ReplaceSegment: React.FC<{ src: string; durationInFrames: number }> = ({
 }) => {
     const frame = useCurrentFrame();
 
-    const scale = interpolate(frame, [0, durationInFrames], [1.0, 1.15], {
+    const scale = interpolate(frame, [0, durationInFrames], [1.0, 1.2], {
         extrapolateRight: "clamp",
     });
 
-    const translateX = interpolate(frame, [0, durationInFrames], [0, -20], {
+    const translateX = interpolate(frame, [0, durationInFrames], [0, -60], {
         extrapolateRight: "clamp",
     });
 
@@ -52,90 +70,74 @@ const ReplaceSegment: React.FC<{ src: string; durationInFrames: number }> = ({
     );
 };
 
-// KEEP segment: Original Video with subtle zoom
-const KeepSegment: React.FC<{
-    source: string;
-    startFrame: number;
-    durationFrames: number;
-}> = ({ source, startFrame, durationFrames }) => {
-    const frame = useCurrentFrame();
-
-    const scale = interpolate(frame, [0, durationFrames], [1.0, 1.05], {
-        extrapolateRight: "clamp",
-    });
-
-    return (
-        <AbsoluteFill style={{ overflow: "hidden" }}>
-            <OffthreadVideo
-                src={source}
-                startFrom={startFrame}
-                endAt={startFrame + durationFrames}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    transform: `scale(${scale})`,
-                }}
-                muted={true}
-            />
-        </AbsoluteFill>
-    );
-};
-
-// Props-first: accept visuals array directly, or load from file
-export const HybridLayer: React.FC<{ visuals?: VisualSegment[] }> = ({
-    visuals: propVisuals,
+// Props-first: accept timeline array directly
+export const HybridLayer: React.FC<{ timeline?: BlueprintSegment[] }> = ({
+    timeline: propTimeline,
 }) => {
     const { fps } = useVideoConfig();
-    const [visuals, setVisuals] = useState<VisualSegment[]>(propVisuals || []);
+    const [timeline, setTimeline] = useState<BlueprintSegment[]>(propTimeline || []);
     const [handle] = useState(() => delayRender());
-    const videoSource = staticFile("video-source.mp4");
 
     useEffect(() => {
-        if (propVisuals && propVisuals.length > 0) {
-            setVisuals(propVisuals);
+        if (propTimeline && propTimeline.length > 0) {
+            setTimeline(propTimeline);
             continueRender(handle);
             return;
         }
-        // Fallback: load from file (reads .visuals key)
-        fetch(staticFile("hybrid_plan.json"))
+
+        fetch(staticFile("blueprint.json"))
             .then((res) => res.json())
             .then((data) => {
-                setVisuals(data.visuals || data);
+                setTimeline(data.timeline || []);
                 continueRender(handle);
             })
             .catch((err) => {
-                console.error("HybridLayer: Failed to load plan", err);
+                console.error("HybridLayer: Failed to load blueprint", err);
                 continueRender(handle);
             });
-    }, [handle, propVisuals]);
+    }, [handle, propTimeline]);
 
-    if (visuals.length === 0) return null;
+    if (timeline.length === 0) return null;
+
+    let currentStartFrame = 0;
 
     return (
         <AbsoluteFill>
-            {visuals.map((segment, index) => {
-                const startFrame = Math.floor(segment.start * fps);
-                const durationFrames = Math.floor(
-                    (segment.end - segment.start) * fps
-                );
+            {timeline.map((segment, index) => {
+                const durationFrames = Math.floor(segment.duration * fps);
+                const from = currentStartFrame;
+                currentStartFrame += durationFrames;
 
                 return (
                     <Sequence
                         key={index}
-                        from={startFrame}
+                        from={from}
                         durationInFrames={durationFrames}
                     >
-                        {segment.type === "REPLACE" && segment.asset ? (
+                        {segment.asset && (
                             <ReplaceSegment
                                 src={segment.asset}
                                 durationInFrames={durationFrames}
                             />
-                        ) : (
-                            <KeepSegment
-                                source={videoSource}
-                                startFrame={startFrame}
-                                durationFrames={durationFrames}
+                        )}
+
+                        {segment.transition === "glitch" && (
+                            <Sequence from={0} durationInFrames={15}>
+                                <GlitchOverlay />
+                            </Sequence>
+                        )}
+
+                        {segment.transition === "fade" && (
+                            <AbsoluteFill
+                                style={{
+                                    backgroundColor: "black",
+                                    opacity: interpolate(
+                                        useCurrentFrame(),
+                                        [0, 10],
+                                        [1, 0]
+                                    ),
+                                    zIndex: 30,
+                                }}
                             />
                         )}
                     </Sequence>
@@ -144,3 +146,4 @@ export const HybridLayer: React.FC<{ visuals?: VisualSegment[] }> = ({
         </AbsoluteFill>
     );
 };
+

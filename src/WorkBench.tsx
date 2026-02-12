@@ -10,6 +10,8 @@ import { getVideoMetadata } from "@remotion/media-utils";
 import { z } from "zod";
 import { HybridLayer } from "./Enhancers/HybridLayer";
 import { OverlayLayer } from "./Enhancers/OverlayLayer";
+import { BrandingLayer } from "./Enhancers/BrandingLayer";
+import { useCurrentFrame } from "remotion";
 
 // Schema for sidebar controls
 export const workBenchSchema = z.object({
@@ -24,12 +26,21 @@ export const workBenchSchema = z.object({
     showCaption: z.boolean(),
 });
 
-// Hybrid plan types
-type VisualSegment = {
-    start: number;
-    end: number;
-    type: "KEEP" | "REPLACE";
+// Blueprint types
+type BlueprintTimeline = {
+    id: number;
+    duration: number;
+    type: "STOCK" | "GENERATE";
     asset?: string;
+    caption?: string;
+    transition?: "glitch" | "fade" | "cut";
+};
+
+type BlueprintProject = {
+    title: string;
+    duration_seconds: number;
+    music_mood: string;
+    brand_color: string;
 };
 
 type TranscriptWord = {
@@ -38,9 +49,10 @@ type TranscriptWord = {
     end: number;
 };
 
-type HybridPlan = {
-    visuals: VisualSegment[];
-    transcript: TranscriptWord[];
+type Blueprint = {
+    project: BlueprintProject;
+    timeline: BlueprintTimeline[];
+    transcript?: TranscriptWord[];
 };
 
 // Theme overlay colors
@@ -59,30 +71,42 @@ export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
     const [videoSize, setVideoSize] = useState<{ w: number; h: number } | null>(
         null
     );
-    const [plan, setPlan] = useState<HybridPlan | null>(null);
+    const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
     const [handle] = useState(() => delayRender());
 
     const videoSource = staticFile("video-source.mp4");
     const overlayColor = THEME_OVERLAYS[theme] || "transparent";
 
     useEffect(() => {
-        // Load video metadata + hybrid plan in parallel
+        // Load video metadata + Enterprise Blueprint in parallel
         Promise.all([
             getVideoMetadata(videoSource),
-            fetch(staticFile("hybrid_plan.json")).then((r) => r.json()),
+            fetch(staticFile("blueprint.json")).then((r) => r.json()),
         ])
-            .then(([meta, planData]) => {
+            .then(([meta, blueprintData]) => {
                 setVideoSize({ w: meta.width, h: meta.height });
-                setPlan(planData);
+                setBlueprint(blueprintData);
                 continueRender(handle);
             })
             .catch((err) => {
-                console.error("WorkBench init error:", err);
-                continueRender(handle);
+                console.error("WorkBench Enterprise init error:", err);
+                // Fallback attempt for previous data format
+                fetch(staticFile("hybrid_plan.json"))
+                    .then(r => r.json())
+                    .then(plan => {
+                        // Build a fake blueprint from hybrid plan if needed
+                        setBlueprint({
+                            project: { title: "Remake", duration_seconds: 60, music_mood: "Cinematic", brand_color: "#FFE600" },
+                            timeline: plan.visuals.map((v: any, i: number) => ({ id: i, duration: v.end - v.start, type: v.type, asset: v.asset })),
+                            transcript: plan.transcript
+                        });
+                        continueRender(handle);
+                    })
+                    .catch(() => continueRender(handle));
             });
     }, [handle, videoSource]);
 
-    if (!videoSize || !plan) {
+    if (!videoSize || !blueprint) {
         return (
             <AbsoluteFill
                 style={{
@@ -93,10 +117,12 @@ export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
                     backgroundColor: "#000",
                 }}
             >
-                Loading…
+                Loading Enterprise Engine…
             </AbsoluteFill>
         );
     }
+
+    const brandColor = blueprint.project.brand_color || "#FFE600";
 
     return (
         <AbsoluteFill style={{ backgroundColor: "#000" }}>
@@ -112,9 +138,9 @@ export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
 
             {/* 
                LAYER 2: HYBRID VISUALS
-               Reads visuals[] — swaps KEEP (original + zoom) / REPLACE (AI + Ken Burns).
+               Reads timeline from Blueprint — swaps types & transitions.
             */}
-            <HybridLayer visuals={plan.visuals} />
+            <HybridLayer timeline={blueprint.timeline} />
 
             {/* LAYER 3: THEME OVERLAY */}
             <AbsoluteFill
@@ -126,9 +152,23 @@ export const WorkBench: React.FC<z.infer<typeof workBenchSchema>> = ({
 
             {/* 
                LAYER 4: HORMOZI CAPTIONS
-               Reads transcript[] — word-by-word stroke-outlined text.
+               Reads from Blueprint (transcript or captions fallback).
             */}
-            {showCaption && <OverlayLayer transcript={plan.transcript} />}
+            {showCaption && (
+                <OverlayLayer
+                    transcript={blueprint.transcript}
+                    timeline={blueprint.timeline}
+                    brandColor={brandColor}
+                />
+            )}
+
+            {/* LAYER 5: ENTERPRISE BRANDING */}
+            <BrandingLayer
+                brandName="Pinnacle AI Solutions"
+                brandColor={brandColor}
+                frame={useCurrentFrame()}
+            />
         </AbsoluteFill>
     );
 };
+
