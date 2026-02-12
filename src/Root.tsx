@@ -1,12 +1,50 @@
 import { Composition } from "remotion";
 import { HelloWorld, myCompSchema } from "./HelloWorld";
 import { Logo, myCompSchema2 } from "./HelloWorld/Logo";
+import { PinnacleAd } from "./PinnacleAd";
+import { GodMode } from "./GodMode";
+import { WorkBench, workBenchSchema } from "./WorkBench";
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="PinnacleAd"
+        component={PinnacleAd}
+        durationInFrames={450}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+
+      <Composition
+        id="GodMode"
+        component={GodMode}
+        durationInFrames={450}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* WorkBench Composition */}
+
+      <Composition
+        id="WorkBench"
+        component={WorkBench}
+        durationInFrames={300}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={workBenchSchema}
+        defaultProps={{
+          theme: "Standard",
+          customCaption: "YOUR TEXT HERE",
+          showCaption: false
+        }}
+      />
+
       <Composition
         // You can take the "id" to render a video:
         // npx remotion render HelloWorld

@@ -1,0 +1,30 @@
+[
+  {
+    "start": 0,
+    "duration": 5,
+    "keyword": "Cyberpunk City",
+    "prompt": "futuristic cyberpunk city street at night, neon rain, cinematic lighting, 8k resolution, photorealistic, blurred motion background",
+    "asset": "assets/gen-0-cyberpunk-city.jpg"
+  },
+  {
+    "start": 5,
+    "duration": 5,
+    "keyword": "Digital Brain",
+    "prompt": "glowing digital brain neural network, blue and purple data streams, artificial intelligence concept, clean minimalist tech background, 4k",
+    "asset": "assets/gen-5-digital-brain.jpg"
+  },
+  {
+    "start": 10,
+    "duration": 5,
+    "keyword": "Coding Matrix",
+    "prompt": "matrix code rain falling, green binary numbers, hacker terminal aesthetic, dark background, cinematic depth of field",
+    "asset": "assets/gen-10-coding-matrix.jpg"
+  },
+  {
+    "start": 15,
+    "duration": 15,
+    "keyword": "Abstract Technology",
+    "prompt": "abstract geometric technology shapes, glassmorphism, soft gradients, modern tech marketing background, white and silver elegance",
+    "asset": "assets/gen-15-abstract-technology.jpg"
+  }
+]

@@ -1,0 +1,328 @@
+{
+    "visuals": [
+        {
+            "start": 0,
+            "end": 3.5,
+            "type": "KEEP",
+            "description": "Software dashboard walkthrough"
+        },
+        {
+            "start": 3.5,
+            "end": 7,
+            "type": "REPLACE",
+            "visual_prompt": "Cyberpunk hacker typing on holographic keyboard, neon blue, cinematic",
+            "asset": "assets/gen-0-cyberpunk-city.jpg"
+        },
+        {
+            "start": 7,
+            "end": 10,
+            "type": "KEEP",
+            "description": "Live analytics dashboard demo"
+        },
+        {
+            "start": 10,
+            "end": 14,
+            "type": "REPLACE",
+            "visual_prompt": "Digital brain neural network with glowing data streams, 4k cinematic",
+            "asset": "assets/gen-5-digital-brain.jpg"
+        },
+        {
+            "start": 14,
+            "end": 18,
+            "type": "KEEP",
+            "description": "Mobile app interface showcase"
+        },
+        {
+            "start": 18,
+            "end": 22,
+            "type": "REPLACE",
+            "visual_prompt": "Matrix code rain, green binary, hacker aesthetic, cinematic",
+            "asset": "assets/gen-10-coding-matrix.jpg"
+        },
+        {
+            "start": 22,
+            "end": 26,
+            "type": "KEEP",
+            "description": "Final results and metrics"
+        },
+        {
+            "start": 26,
+            "end": 30,
+            "type": "REPLACE",
+            "visual_prompt": "Abstract geometric technology, glassmorphism, modern elegance",
+            "asset": "assets/gen-15-abstract-technology.jpg"
+        }
+    ],
+    "transcript": [
+        {
+            "word": "Here",
+            "start": 0.1,
+            "end": 0.4
+        },
+        {
+            "word": "are",
+            "start": 0.4,
+            "end": 0.6
+        },
+        {
+            "word": "the",
+            "start": 0.6,
+            "end": 0.8
+        },
+        {
+            "word": "results",
+            "start": 0.8,
+            "end": 1.3
+        },
+        {
+            "word": "you've",
+            "start": 1.4,
+            "end": 1.7
+        },
+        {
+            "word": "been",
+            "start": 1.7,
+            "end": 1.9
+        },
+        {
+            "word": "waiting",
+            "start": 1.9,
+            "end": 2.3
+        },
+        {
+            "word": "for",
+            "start": 2.3,
+            "end": 2.5
+        },
+        {
+            "word": "This",
+            "start": 3.5,
+            "end": 3.8
+        },
+        {
+            "word": "is",
+            "start": 3.8,
+            "end": 4.0
+        },
+        {
+            "word": "the",
+            "start": 4.0,
+            "end": 4.2
+        },
+        {
+            "word": "future",
+            "start": 4.2,
+            "end": 4.7
+        },
+        {
+            "word": "of",
+            "start": 4.7,
+            "end": 4.9
+        },
+        {
+            "word": "AI",
+            "start": 4.9,
+            "end": 5.4
+        },
+        {
+            "word": "powered",
+            "start": 5.5,
+            "end": 6.0
+        },
+        {
+            "word": "automation",
+            "start": 6.0,
+            "end": 6.8
+        },
+        {
+            "word": "Look",
+            "start": 7.0,
+            "end": 7.3
+        },
+        {
+            "word": "at",
+            "start": 7.3,
+            "end": 7.5
+        },
+        {
+            "word": "these",
+            "start": 7.5,
+            "end": 7.8
+        },
+        {
+            "word": "real",
+            "start": 7.8,
+            "end": 8.1
+        },
+        {
+            "word": "time",
+            "start": 8.1,
+            "end": 8.5
+        },
+        {
+            "word": "analytics",
+            "start": 8.5,
+            "end": 9.2
+        },
+        {
+            "word": "Powered",
+            "start": 10.0,
+            "end": 10.5
+        },
+        {
+            "word": "by",
+            "start": 10.5,
+            "end": 10.7
+        },
+        {
+            "word": "pure",
+            "start": 10.7,
+            "end": 11.1
+        },
+        {
+            "word": "intelligence",
+            "start": 11.1,
+            "end": 12.0
+        },
+        {
+            "word": "and",
+            "start": 12.2,
+            "end": 12.4
+        },
+        {
+            "word": "cutting",
+            "start": 12.4,
+            "end": 12.8
+        },
+        {
+            "word": "edge",
+            "start": 12.8,
+            "end": 13.2
+        },
+        {
+            "word": "technology",
+            "start": 13.2,
+            "end": 14.0
+        },
+        {
+            "word": "Check",
+            "start": 14.0,
+            "end": 14.3
+        },
+        {
+            "word": "out",
+            "start": 14.3,
+            "end": 14.5
+        },
+        {
+            "word": "the",
+            "start": 14.5,
+            "end": 14.7
+        },
+        {
+            "word": "mobile",
+            "start": 14.7,
+            "end": 15.2
+        },
+        {
+            "word": "experience",
+            "start": 15.2,
+            "end": 15.9
+        },
+        {
+            "word": "Enterprise",
+            "start": 18.0,
+            "end": 18.7
+        },
+        {
+            "word": "grade",
+            "start": 18.7,
+            "end": 19.1
+        },
+        {
+            "word": "security",
+            "start": 19.1,
+            "end": 19.8
+        },
+        {
+            "word": "built",
+            "start": 20.0,
+            "end": 20.3
+        },
+        {
+            "word": "in",
+            "start": 20.3,
+            "end": 20.5
+        },
+        {
+            "word": "from",
+            "start": 20.5,
+            "end": 20.8
+        },
+        {
+            "word": "day",
+            "start": 20.8,
+            "end": 21.1
+        },
+        {
+            "word": "one",
+            "start": 21.1,
+            "end": 21.5
+        },
+        {
+            "word": "These",
+            "start": 22.0,
+            "end": 22.3
+        },
+        {
+            "word": "numbers",
+            "start": 22.3,
+            "end": 22.8
+        },
+        {
+            "word": "speak",
+            "start": 22.8,
+            "end": 23.2
+        },
+        {
+            "word": "for",
+            "start": 23.2,
+            "end": 23.4
+        },
+        {
+            "word": "themselves",
+            "start": 23.4,
+            "end": 24.2
+        },
+        {
+            "word": "Pinnacle",
+            "start": 26.0,
+            "end": 26.6
+        },
+        {
+            "word": "AI",
+            "start": 26.6,
+            "end": 27.0
+        },
+        {
+            "word": "Solutions",
+            "start": 27.0,
+            "end": 27.8
+        },
+        {
+            "word": "Get",
+            "start": 28.0,
+            "end": 28.2
+        },
+        {
+            "word": "started",
+            "start": 28.2,
+            "end": 28.6
+        },
+        {
+            "word": "today",
+            "start": 28.6,
+            "end": 29.2
+        }
+    ]
+}

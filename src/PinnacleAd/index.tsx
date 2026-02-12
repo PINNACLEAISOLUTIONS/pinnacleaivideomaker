@@ -134,7 +134,7 @@ export const PinnacleAd: React.FC = () => {
                         textShadow: '0 0 40px rgba(56, 189, 248, 0.6)',
                         marginTop: '20px'
                     }}>
-                        PINNACLE-AI.COM
+                        PINNACLEAISOLUTIONS.SITE
                     </div>
                 </AbsoluteFill>
             </Sequence>
